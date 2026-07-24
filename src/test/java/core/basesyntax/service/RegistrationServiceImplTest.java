@@ -6,8 +6,10 @@ import core.basesyntax.db.Storage;
 import core.basesyntax.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RegistrationServiceImplTest {
     private static final int MINIMAL_AGE = 18;
@@ -27,7 +29,8 @@ class RegistrationServiceImplTest {
         user.setLogin(null);
         user.setPassword(null);
         user.setAge(null);
-        assertThrows(NullPointerException.class, () -> registrationService.register(user));
+        assertThrows(NullPointerException.class,
+                () -> registrationService.register(user));
     }
 
     @Test
@@ -41,7 +44,8 @@ class RegistrationServiceImplTest {
         secondUser.setPassword("password");
         secondUser.setAge(18);
         assertEquals(storageDao.get(user.getLogin()).getLogin(), secondUser.getLogin());
-        assertThrows(UserRegistrationException.class, () -> registrationService.register(secondUser));
+        assertThrows(UserRegistrationException.class,
+                () -> registrationService.register(secondUser));
     }
 
     @Test
@@ -50,7 +54,8 @@ class RegistrationServiceImplTest {
         user.setPassword("password");
         user.setAge(18);
         assertTrue(user.getLogin().length() < MINIMAL_LOGIN_LENGTH);
-        assertThrows(UserRegistrationException.class, () -> registrationService.register(user));
+        assertThrows(UserRegistrationException.class,
+                () -> registrationService.register(user));
     }
 
     @Test
@@ -59,16 +64,18 @@ class RegistrationServiceImplTest {
         user.setPassword("pass");
         user.setAge(18);
         assertTrue(user.getPassword().length() < MINIMAL_PASSWORD_LENGTH);
-        assertThrows(UserRegistrationException.class, () -> registrationService.register(user));
+        assertThrows(UserRegistrationException.class,
+                () -> registrationService.register(user));
     }
 
     @Test
-    void register_ageTooYoung_notOk() throws UserRegistrationException {
+    void register_ageTooYoung_notOk() {
         user.setLogin("login1");
         user.setPassword("password");
         user.setAge(15);
         assertTrue(user.getAge() < MINIMAL_AGE);
-        assertThrows(UserRegistrationException.class, () -> registrationService.register(user));
+        assertThrows(UserRegistrationException.class,
+                () -> registrationService.register(user));
     }
 
     @Test
