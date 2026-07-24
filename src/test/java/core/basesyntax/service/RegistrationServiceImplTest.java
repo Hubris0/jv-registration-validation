@@ -26,6 +26,12 @@ class RegistrationServiceImplTest {
     }
 
     @Test
+    void register_userIsNull_notOk() {
+        assertThrows(UserRegistrationException.class,
+                () -> registrationService.register(user));
+    }
+
+    @Test
     void register_inputIsNull_notOk() {
         user.setLogin(null);
         user.setPassword(null);
@@ -135,7 +141,8 @@ class RegistrationServiceImplTest {
         user.setLogin("login1");
         user.setPassword("password");
         user.setAge(18);
-        assertFalse(user.getAge() < MINIMAL_AGE);
+        registrationService.register(user);
+        assertFalse(storageDao.get(user.getLogin()).getAge() < MINIMAL_AGE);
     }
 
     @Test
@@ -144,10 +151,10 @@ class RegistrationServiceImplTest {
         user.setPassword("password");
         user.setAge(18);
         registrationService.register(user);
-        assertFalse(user.getLogin().length() < MINIMAL_LOGIN_LENGTH);
-        assertFalse(user.getPassword().length() < MINIMAL_PASSWORD_LENGTH);
-        assertFalse(user.getAge() < MINIMAL_AGE);
         User storedUser = storageDao.get(user.getLogin());
+        assertFalse(storedUser.getLogin().length() < MINIMAL_LOGIN_LENGTH);
+        assertFalse(storedUser.getPassword().length() < MINIMAL_PASSWORD_LENGTH);
+        assertFalse(storedUser.getAge() < MINIMAL_AGE);
         assertEquals(user, storedUser);
     }
 }
