@@ -14,13 +14,18 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public User register(User user) throws UserRegistrationException {
         if (storageDao.get(user.getLogin()) != null) {
-            throw new UserRegistrationException("User already exists");
-        } else if (user.getLogin().length() < MINIMAL_LOGIN_LENGTH) {
-            throw new UserRegistrationException("Login too short");
-        } else if (user.getPassword().length() < MINIMAL_PASSWORD_LENGTH) {
-            throw new UserRegistrationException("Password too short");
-        } else if (user.getAge() < MINIMAL_AGE) {
-            throw new UserRegistrationException("User is not adult");
+            throw new UserRegistrationException("User.login already exists");
+        }
+        if (user.getLogin() == null || user.getLogin().length() < MINIMAL_LOGIN_LENGTH) {
+            throw new UserRegistrationException("User.login missing or too short. " +
+                    "Should be at least " + MINIMAL_LOGIN_LENGTH + " characters");
+        }
+        if (user.getPassword() == null || user.getPassword().length() < MINIMAL_PASSWORD_LENGTH) {
+            throw new UserRegistrationException("User.password missing or too short. " +
+                    "Should be at least " + MINIMAL_PASSWORD_LENGTH + "characters");
+        }
+        if (user.getAge() == null || user.getAge() < MINIMAL_AGE) {
+            throw new UserRegistrationException("User.age is missing or too low");
         }
         storageDao.add(user);
         return user;

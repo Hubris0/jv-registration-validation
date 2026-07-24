@@ -29,7 +29,28 @@ class RegistrationServiceImplTest {
         user.setLogin(null);
         user.setPassword(null);
         user.setAge(null);
-        assertThrows(NullPointerException.class,
+        assertThrows(UserRegistrationException.class,
+                () -> registrationService.register(user));
+    }
+
+    @Test
+    void register_loginIsNull_notOk() {
+        user.setLogin(null);
+        assertThrows(UserRegistrationException.class,
+                () -> registrationService.register(user));
+    }
+
+    @Test
+    void register_passwordIsNull_notOk() {
+        user.setPassword(null);
+        assertThrows(UserRegistrationException.class,
+                () -> registrationService.register(user));
+    }
+
+    @Test
+    void register_ageIsNull_notOk() {
+        user.setAge(null);
+        assertThrows(UserRegistrationException.class,
                 () -> registrationService.register(user));
     }
 
@@ -38,7 +59,7 @@ class RegistrationServiceImplTest {
         user.setLogin("login1");
         user.setPassword("password");
         user.setAge(18);
-        registrationService.register(user);
+        Storage.people.add(user);
         User secondUser = new User();
         secondUser.setLogin("login1");
         secondUser.setPassword("password");
@@ -59,9 +80,29 @@ class RegistrationServiceImplTest {
     }
 
     @Test
+    void register_loginEdgeCase_notOk() throws UserRegistrationException {
+        user.setLogin("login");
+        user.setPassword("password");
+        user.setAge(18);
+        assertTrue(user.getLogin().length() < MINIMAL_LOGIN_LENGTH);
+        assertThrows(UserRegistrationException.class,
+                () -> registrationService.register(user));
+    }
+
+    @Test
     void register_passwordTooShort_notOk() throws UserRegistrationException {
         user.setLogin("login1");
         user.setPassword("pass");
+        user.setAge(18);
+        assertTrue(user.getPassword().length() < MINIMAL_PASSWORD_LENGTH);
+        assertThrows(UserRegistrationException.class,
+                () -> registrationService.register(user));
+    }
+
+    @Test
+    void register_passwordEdgeCase_notOk() throws UserRegistrationException {
+        user.setLogin("login1");
+        user.setPassword("passw");
         user.setAge(18);
         assertTrue(user.getPassword().length() < MINIMAL_PASSWORD_LENGTH);
         assertThrows(UserRegistrationException.class,
@@ -76,6 +117,24 @@ class RegistrationServiceImplTest {
         assertTrue(user.getAge() < MINIMAL_AGE);
         assertThrows(UserRegistrationException.class,
                 () -> registrationService.register(user));
+    }
+
+    @Test
+    void register_ageNegative_notOk() {
+        user.setLogin("login1");
+        user.setPassword("password");
+        user.setAge(-18);
+        assertTrue(user.getAge() < MINIMAL_AGE);
+        assertThrows(UserRegistrationException.class,
+                () -> registrationService.register(user));
+    }
+
+    @Test
+    void register_ageBoundary_ok() {
+        user.setLogin("login1");
+        user.setPassword("password");
+        user.setAge(18);
+        assertFalse(user.getAge() < MINIMAL_AGE);
     }
 
     @Test
